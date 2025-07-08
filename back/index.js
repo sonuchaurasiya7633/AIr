@@ -10,7 +10,7 @@ import bookingRouter from "./routes/booking.route.js";
 
 dotenv.config();
 
-let port = process.env.PORT || 6000;
+let port = process.env.PORT;
 
 let app = express();
 app.use(express.json());
