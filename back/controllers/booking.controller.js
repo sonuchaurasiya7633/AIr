@@ -53,40 +53,16 @@ export const createBooking = async (req, res) => {
 
 export const cancelBooking = async (req, res) => {
   try {
-    let { id } = req.params; 
-    let booking = await Booking.findOne({ listing: id, status: "booked" });
-    if (!booking) {
-      return res.status(404).json({ message: "Booking Not Found" });
-    }
-
-    // Update booking status to "cancel"
-    booking.status = "cancel";
-    await booking.save();
-
-    // Update listing to mark as not booked
-    let listing = await Listing.findByIdAndUpdate(
-      id,
-      { isBooked: false, guest: null },
-      { new: true }
-    );
-    if (!listing) {
-      return res.status(404).json({ message: "Listing Not Found" });
-    }
-
-    // Remove booking from user's bookings array
-    let user = await User.findByIdAndUpdate(
-      booking.guest,
-      {
-        $pull: { booking: booking._id },
-      },
-      { new: true }
-    );
+    let {id} = req.params;
+    let listing = await Listing.findByIdAndUpdate(id,{isBooked:false})
+    let user = await User.findByIdAndUpdate(listing.guest,{
+      $pull:{ booking: listing._id }
+    },{ new: true });
     if (!user) {
-      return res.status(404).json({ message: "User Not Found" });
+      return res.status(404).json({ message: "User is Not Found" });
     }
-
-    return res.status(200).json({ message: "Booking Cancelled" });
+    return res.status(200).json({ message: "Booking Cancelled Successfully" });
   } catch (error) {
-    return res.status(500).json({ message: `Booking Cancel Error: ${error.message}` });
+    return res.status(500).json({ message: `Cancel booking error: ${error.message}` });
   }
 };
